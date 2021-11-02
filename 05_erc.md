@@ -1,10 +1,47 @@
 ### 21. Transaction order dependence:
 
-**Race conditions** can be forced on specific Ethereum transactions by **monitoring the mempool**.
+**WARNING**: *Race conditions* can be forced on specific Ethereum transactions by *monitoring the mempool*.
 
-**EXAMPLE**: the classic `ERC20` `approve()` change can be **front-run**
+**EXAMPLE**: the classic `ERC20` `approve()` change can be *front-run*
 
 **BEST PRACTICE**: Do not make assumptions about transaction order dependence.
+
+> I dont understand this example
+
+```solidity
+/*
+ * @source: https://github.com/ConsenSys/evm-analyzer-benchmark-suite
+ * @author: Suhabe Bugrara
+ */
+
+pragma solidity ^0.4.16;
+
+contract EthTxOrderDependenceMinimal {
+    address public owner;
+    bool public claimed;
+    uint public reward;
+
+    function EthTxOrderDependenceMinimal() public {
+        owner = msg.sender;
+    }
+
+    function setReward() public payable {
+        require (!claimed);
+
+        require(msg.sender == owner);
+        owner.transfer(reward);
+        reward = msg.value;
+    }
+
+    function claimReward(uint256 submission) {
+        require (!claimed);
+        require(submission < 10);
+
+        msg.sender.transfer(reward);
+        claimed = true;
+    }
+
+```
 
 see [here](https://swcregistry.io/docs/SWC-114)
 
@@ -12,11 +49,22 @@ see [here](https://swcregistry.io/docs/SWC-114)
 
 **BEST PRACTICE**: Use `safeIncreaseAllowance()` and `safeDecreaseAllowance()` from OpenZeppelin’s `SafeERC20` implementation to **prevent race conditions** from manipulating the allowance amounts.
 
+```solidity
+function safeIncreaseAllowance(
+    IERC20 token,
+    address spender,
+    uint256 value
+) internal {
+    uint256 newAllowance = token.allowance(address(this), spender) + value;
+    _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+}
+```
+
 see [here](https://swcregistry.io/docs/SWC-114)
 
 ### 23. Signature malleability:
 
-**WARNING**: The `ecrecover` function is susceptible to **signature malleability** which could lead to **replay attacks**.
+**WARNING**: The `ecrecover` function is susceptible to *signature malleability* which could lead to *replay attacks*.
 
 **BEST PRACTICE**: Consider using OpenZeppelin’s `ECDSA` library.
 
