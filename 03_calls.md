@@ -28,9 +28,9 @@ see [here](https://swcregistry.io/docs/SWC-112)
 
 ### 13. Reentrancy vulnerabilities:
 
-**Untrusted external contract calls** could **call back**, leading to unexpected results such as **multiple withdrawals** or **out-of-order events**.
+*Untrusted external contract calls* could *call back* to the calling contract, leading to unexpected results such as *multiple withdrawals* or *out-of-order events*.
 
-**BEST PRACTICE**: Use check-effects-interactions pattern or reentrancy guards.
+**BEST PRACTICE**: Use *check-effects-interactions* pattern or *reentrancy guards*.
 
 ```solidity
 /*
@@ -70,6 +70,8 @@ see [here](https://swcregistry.io/docs/SWC-107)
 
 **WARNING**: Malicious contract addresses may cause reentrancy on such callbacks if reentrancy guards are not used by `ERC777` hooks.
 
+**BEST PRACTICE**: Use *check-effects-interactions* pattern or *reentrancy guards*.
+
 > The `tokensToSend` hook of `ERC777` is vulnerable to reentrancy
 
 ```solidity
@@ -89,9 +91,11 @@ see [here](https://quantstamp.com/blog/how-the-dforce-hacker-used-reentrancy-to-
 
 ### 15. Avoid transfer()/send() as reentrancy mitigations:
 
-Although `transfer()` and `send()` have been recommended as a security best-practice to prevent reentrancy attacks because they only **forward 2300 gas**, the **gas repricing** of opcodes **may break deployed contracts**.
+`transfer()` and `send()` have been previously recommended as a security best-practice to prevent reentrancy attacks because they only *forward 2300 gas*.
 
-**BEST PRACTICE**: Use `call()` to send Ether instead, without hardcoded gas limits. Ensure **reentrancy protection** via **checks-effects-interactions pattern** or **reentrancy guards**.
+**WARNING**: the *gas repricing* of opcodes in certain hard forks *may break deployed contracts* depending on the 2300 gas stipend.
+
+**BEST PRACTICE**: Use `call()` to send Ether, without hardcoded gas limits. Ensure *reentrancy protection* via *checks-effects-interactions pattern* or *reentrancy guards*.
 
 > One should avoid hardcoded gas limits in calls, because hard forks may change opcode gas costs and break deployed contracts:
 

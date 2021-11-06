@@ -1,7 +1,7 @@
 
 ### 16. Private on-chain data:
 
-**WARNING**: Marking variables `private` does not mean that they cannot be read on-chain.
+**WARNING**: Marking variables `private` only means that it cannot be read by other smart contracts. It does not mean that the data cannot be read on-chain.
 
 **BEST PRACTICE**: data intended to be secret should not be stored unencrypted in contract code or state but instead stored encrypted or off-chain.
 
@@ -45,6 +45,8 @@ contract OddEven {
 see [here](https://swcregistry.io/docs/SWC-136)
 
 ### 17. Weak PRNG:
+
+PRNG = Probabilistic Random Number Generator
 
 **WARNING**: PRNG relying on `block.timestamp`, `now` or `blockhash` can be influenced by miners to some extent and should be avoided.
 

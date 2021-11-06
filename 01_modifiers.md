@@ -2,7 +2,8 @@
 
 **WARNING**: *Missing checks* allow attackers to control *critical logic*.
 
-**BEST PRACTICE**: Contract functions executing *critical logic should have appropriate access control*, enforced via `address` checks **typically in modifiers**.
+**BEST PRACTICE**: Contract functions executing *critical logic should have appropriate access control*, enforced via `address` checks *typically in modifiers*.
+
 - e.g. owner, controller, admin checks
 
 see [here](https://docs.openzeppelin.com/contracts/3.x/api/access)
@@ -12,40 +13,20 @@ see [here](https://dasp.co/#item-2)
 
 **WARNING**: *Unprotected* (external/public) function calls *sending Ether/tokens* to user-controlled addresses may allow users to *withdraw unauthorized funds*.
 
-> Integer overflow in the external calls of this contract results in Ether theft:
+> Anyone can call the withdraw function below, and drain the contract of its balance:
 
 ```solidity
-/*
- * @source: https://capturetheether.com/challenges/math/token-sale/
- * @author: Steve Marx
- */
+pragma solidity ^0.4.22;
 
-pragma solidity ^0.4.21;
+contract SimpleEtherDrain {
 
-contract TokenSaleChallenge {
-    mapping(address => uint256) public balanceOf;
-    uint256 constant PRICE_PER_TOKEN = 1 ether;
+  function withdrawAllAnyone() {
+    msg.sender.transfer(this.balance);
+  }
 
-    function TokenSaleChallenge(address _player) public payable {
-        require(msg.value == 1 ether);
-    }
+  function () public payable {
+  }
 
-    function isComplete() public view returns (bool) {
-        return address(this).balance < 1 ether;
-    }
-
-    function buy(uint256 numTokens) public payable {
-        require(msg.value == numTokens * PRICE_PER_TOKEN);
-
-        balanceOf[msg.sender] += numTokens;
-    }
-
-    function sell(uint256 numTokens) public {
-        require(balanceOf[msg.sender] >= numTokens);
-
-        balanceOf[msg.sender] -= numTokens;
-        msg.sender.transfer(numTokens * PRICE_PER_TOKEN);
-    }
 }
 ```
 
@@ -53,7 +34,7 @@ see [here](https://swcregistry.io/docs/SWC-105)
 
 ### 6. Unprotected call to selfdestruct:
 
-**WARNING**: A user/attacker can mistakenly/intentionally kill the contract if `selfdestruct` is not protected.
+**WARNING**: A user/attacker can mistakenly/intentionally kill the contract if `selfdestruct` is not protected, transferring its balance elsewhere.
 
 **BEST PRACTICE**: Protect access to `selfdestruct` functions or remove them.
 
@@ -70,9 +51,11 @@ see [here](https://swcregistry.io/docs/SWC-106)
 
 ### 7. Modifier side-effects:
 
-**WARNING**: External calls in modifiers will typically **violate** the **checks-effects-interactions pattern**. These side-effects may go unnoticed by developers/auditors because the modifier code is typically far from the function implementation.
+**WARNING**: External calls in modifiers will typically **violate** the *checks-effects-interactions* pattern.
 
-**BEST PRACTICE**: Modifiers should only **implement checks** and **not make state changes**.
+- These side-effects may go unnoticed by developers/auditors because the modifier code is typically far from the function implementation.
+
+**BEST PRACTICE**: Modifiers should have no side-effects. They should only *implement checks* and *not make state changes*.
 
 > The modifier `isEligible` of the contracts below makes `Election` susceptible to a reentrancy attack via an external call to `registry`:
 

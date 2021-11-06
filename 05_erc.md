@@ -1,53 +1,28 @@
 ### 21. Transaction order dependence:
 
-**WARNING**: *Race conditions* can be forced on specific Ethereum transactions by *monitoring the mempool*.
+**WARNING**: *Race conditions* can be forced on specific Ethereum transactions by *monitoring the mempool*. Transactions my be *front-run*, *back-run*, or *sandwich* attacked.
 
 **EXAMPLE**: the classic `ERC20` `approve()` change can be *front-run*
 
 **BEST PRACTICE**: Do not make assumptions about transaction order dependence.
 
-> I dont understand this example
+> ERC20 approve() can be front-run, allowing the attacker (spender) to use first spend the old allowance, have it set by the pending approve() call, and then spend the new allowance.
 
 ```solidity
-/*
- * @source: https://github.com/ConsenSys/evm-analyzer-benchmark-suite
- * @author: Suhabe Bugrara
- */
+function approve(address spender, uint256 value) public returns (bool) {
+  require(spender != address(0));
 
-pragma solidity ^0.4.16;
-
-contract EthTxOrderDependenceMinimal {
-    address public owner;
-    bool public claimed;
-    uint public reward;
-
-    function EthTxOrderDependenceMinimal() public {
-        owner = msg.sender;
-    }
-
-    function setReward() public payable {
-        require (!claimed);
-
-        require(msg.sender == owner);
-        owner.transfer(reward);
-        reward = msg.value;
-    }
-
-    function claimReward(uint256 submission) {
-        require (!claimed);
-        require(submission < 10);
-
-        msg.sender.transfer(reward);
-        claimed = true;
-    }
-
+  _allowed[msg.sender][spender] = value;
+  emit Approval(msg.sender, spender, value);
+  return true;
+}
 ```
 
 see [here](https://swcregistry.io/docs/SWC-114)
 
 ### 22. ERC20 approve() race condition:
 
-**BEST PRACTICE**: Use `safeIncreaseAllowance()` and `safeDecreaseAllowance()` from OpenZeppelin’s `SafeERC20` implementation to **prevent race conditions** from manipulating the allowance amounts.
+**BEST PRACTICE**: Use `safeIncreaseAllowance()` and `safeDecreaseAllowance()` from OpenZeppelin’s `SafeERC20` implementation to *prevent race conditions* from manipulating the allowance amounts.
 
 ```solidity
 function safeIncreaseAllowance(
@@ -66,6 +41,8 @@ see [here](https://swcregistry.io/docs/SWC-114)
 
 **WARNING**: The `ecrecover` function is susceptible to *signature malleability* which could lead to *replay attacks*.
 
+A signature is composed of `(v, r, s)` components. The signature malleability is due to the `s` component, which may be right aligned or left aligned. The `ECDSA` library by OpenZeppelin forces the `s` component to use the lower order bits, mitigating the malleability.
+
 **BEST PRACTICE**: Consider using OpenZeppelin’s `ECDSA` library.
 
 see [here](https://swcregistry.io/docs/SWC-117)
@@ -74,10 +51,9 @@ see [here](https://medium.com/cryptronics/signature-replay-vulnerabilities-in-sm
 
 ### 24. ERC20 transfer() does not return boolean:
 
-> substack post is unclear
-
 **BUG SUMMARY**: The `ERC20` function `transfer()` implemented a **faulty interface** early in its development.
-    - These faulty `transfer()` implementations do not return a `bool` success condition.
+    - `transfer()` should return `bool` success condition, per `ERC20` specs
+    - faulty `transfer()` implementations do not adhere to the specs, and do not return `bool`
     - Contracts compiled with `solc >= 0.4.22` interacting with these faulty `transfer()` functions will `revert`.
 
 **BEST PRACTICE**: Use OpenZeppelin’s `SafeERC20` wrappers.
@@ -89,7 +65,10 @@ see [here](https://medium.com/coinmonks/missing-return-value-bug-at-least-130-to
 
 > substack post is unclear
 
-Contracts compiled with `solc >= 0.4.22` interacting with `ERC721` `ownerOf()` that returns a `bool` instead of `address` type will `revert`.
+**BUG SUMMARY**: The `ERC721` function `ownerOf()` may have a **faulty interface**.
+   - `ownerOf()` should return `address`, per `ERC721` specs
+   - faulty implementations of `ownerOf()` return `bool` instead of `address`
+   - contracts compiled with `solc >= 0.4.22` interacting with faulty `ownerOf()` implementations will `revert`.
 
 **BEST PRACTICE**: Use OpenZeppelin’s `ERC721` contracts.
 
