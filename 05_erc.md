@@ -66,9 +66,9 @@ see [here](https://medium.com/coinmonks/missing-return-value-bug-at-least-130-to
 > substack post is unclear
 
 **BUG SUMMARY**: The `ERC721` function `ownerOf()` may have a **faulty interface**.
-   - `ownerOf()` should return `address`, per `ERC721` specs
-   - faulty implementations of `ownerOf()` return `bool` instead of `address`
-   - contracts compiled with `solc >= 0.4.22` interacting with faulty `ownerOf()` implementations will `revert`.
+- `ownerOf()` should return `address`, per `ERC721` specs
+- faulty implementations of `ownerOf()` return `bool` instead of `address`
+- contracts compiled with `solc >= 0.4.22` interacting with faulty `ownerOf()` implementations will `revert`.
 
 **BEST PRACTICE**: Use OpenZeppelin’s `ERC721` contracts.
 
