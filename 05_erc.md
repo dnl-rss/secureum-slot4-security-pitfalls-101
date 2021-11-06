@@ -52,9 +52,9 @@ see [here](https://medium.com/cryptronics/signature-replay-vulnerabilities-in-sm
 ### 24. ERC20 transfer() does not return boolean:
 
 **BUG SUMMARY**: The `ERC20` function `transfer()` implemented a **faulty interface** early in its development.
-    - `transfer()` should return `bool` success condition, per `ERC20` specs
-    - faulty `transfer()` implementations do not adhere to the specs, and do not return `bool`
-    - Contracts compiled with `solc >= 0.4.22` interacting with these faulty `transfer()` functions will `revert`.
+- `transfer()` should return `bool` success condition, per `ERC20` specs
+- faulty `transfer()` implementations do not adhere to the specs, and do not return `bool`
+- Contracts compiled with `solc >= 0.4.22` interacting with these faulty `transfer()` functions will `revert`.
 
 **BEST PRACTICE**: Use OpenZeppelin’s `SafeERC20` wrappers.
 
