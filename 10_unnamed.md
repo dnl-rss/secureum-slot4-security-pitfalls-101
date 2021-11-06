@@ -99,6 +99,7 @@ see [here](https://github.com/crytic/slither/wiki/Detector-Documentation#missing
 **WARNING** Transaction relayers need to be trusted to provide enough gas for the transaction to succeed.
 
 see [here](https://swcregistry.io/docs/SWC-126)
+For information on what Gas Griefing is: [read this](https://consensys.github.io/smart-contract-best-practices/known_attacks/#insufficient-gas-griefing)
 
 
 ### 58. Modifying reference type parameters:
