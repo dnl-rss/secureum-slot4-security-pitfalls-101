@@ -128,7 +128,7 @@ contract TimeLock {
 
 see [here](https://swcregistry.io/docs/SWC-116)
 
-### 20. Integer overflow/underflow:
+### 19. Integer overflow/underflow:
 
 **WARNING** Not using OpenZeppelin’s `SafeMath` (or similar libraries) that check for overflows/underflows may lead to vulnerabilities or unexpected behavior if user/attacker can control the integer operands of such arithmetic operations.
 
@@ -137,7 +137,7 @@ see [here](https://swcregistry.io/docs/SWC-116)
 see [here](https://swcregistry.io/docs/SWC-101)
 see [here](https://blog.soliditylang.org/2020/10/28/solidity-0.8.x-preview/)
 
-### Divide after multiply
+### 20. Divide after multiply
 
 **WARNING**: Division before multiplication can cause precision bugs.
 
